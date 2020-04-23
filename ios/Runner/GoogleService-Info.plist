@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>378783482776-jls98f03qe2ajv17coo6q48invb31ji9.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.378783482776-jls98f03qe2ajv17coo6q48invb31ji9</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBW0rwXLiaOKpjqVJ-DMnuXqnVRUe52-LQ</string>
+	<key>GCM_SENDER_ID</key>
+	<string>378783482776</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.diary</string>
+	<key>PROJECT_ID</key>
+	<string>diaryflutterapp-d1f6b</string>
+	<key>STORAGE_BUCKET</key>
+	<string>diaryflutterapp-d1f6b.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:378783482776:ios:1306ac715249795d3da1ed</string>
+	<key>DATABASE_URL</key>
+	<string>https://diaryflutterapp-d1f6b.firebaseio.com</string>
+</dict>
+</plist>
