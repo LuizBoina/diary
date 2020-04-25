@@ -6,48 +6,68 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  List<DocumentSnapshot> currentPageList = List<DocumentSnapshot>();
+
+  //initialize with first day of actual month
+  DateTime selectedMoth =
+      DateTime(DateTime.now().year, DateTime.now().month, 1);
+
+  //get date from the first updated page
+  final Future<dynamic> firstPage = Firestore.instance
+      .collection('diaries')
+      .document('myDiary')
+      .collection('pages')
+      .orderBy('date')
+      .limit(1)
+      .getDocuments()
+      .then((value) => value.documents.first['date'].toDate())
+      .catchError((err) {
+    print('erro primeiro dia $err');
+    throw err;
+  });
+
+  _updatePageList(newPageList) {
+    if (newPageList != currentPageList)
+      setState(() {
+        currentPageList = newPageList;
+      });
+  }
+
+  _getPageListMonth(DateTime selectedMoth) async {
+    Timestamp selectedMothTimestamp = Timestamp.fromDate(selectedMoth);
+    final Timestamp firstDayNextMonth =
+        Timestamp.fromDate(DateTime(selectedMoth.year, selectedMoth.month + 1));
+
+    List<DocumentSnapshot> result = await Firestore.instance
+        .collection('diaries')
+        .document('myDiary')
+        .collection('pages')
+        .where('date',
+            isGreaterThanOrEqualTo: selectedMothTimestamp,
+            isLessThan: firstDayNextMonth)
+        .orderBy('date', descending: true)
+        .getDocuments()
+        .then((value) => value.documents);
+    return result;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final Timestamp firstDayMonth = Timestamp.fromDate(
-        DateTime(DateTime.now().year, DateTime.now().month, 1));
-
-    final Query pagesList = Firestore.instance
-        .collection('diaries')
-        .document('myDiary')
-        .collection('pages')
-        .where('date', isGreaterThanOrEqualTo: firstDayMonth)
-        .orderBy('date', descending: true);
-
-    final Future<dynamic> firstPage = Firestore.instance
-        .collection('diaries')
-        .document('myDiary')
-        .collection('pages')
-        .orderBy('date')
-        .limit(1)
-        .getDocuments()
-        .then((value) => value.documents.first['date'].toDate())
-        .catchError((err) {
-      print('erro primeiro dia $err');
-      throw err;
-    });
-
-    //can be DateTime or null
-    final Future<dynamic> lastPage = pagesList
-        .getDocuments()
-        .then((value) => value.documents.first['date'].toDate())
-        .catchError((err) {
-      print('erro primeiro dia $err');
-      throw err;
-    });
-
     return FutureBuilder<dynamic>(
         future: firstPage,
-        builder: (context, snapshotFirstPage) {
+        builder: (context, firstPageSnap) {
           return FutureBuilder<dynamic>(
-              future: lastPage,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
+              future: _getPageListMonth(selectedMoth),
+              builder: (context, pagesListSnap) {
+                if (pagesListSnap.hasData) {
+                  List<DocumentSnapshot> currentPageList =
+                      pagesListSnap.data as List<DocumentSnapshot>;
                   return Scaffold(
                     backgroundColor: Theme.of(context).primaryColor,
                     appBar: AppBar(
@@ -66,42 +86,29 @@ class HomeScreen extends StatelessWidget {
                               padding: EdgeInsets.only(left: 3.0),
                               child: GestureDetector(
                                 onTap: () {
-                                  if (snapshotFirstPage.hasData) {
-                                    return showMonthPicker(
-                                      context: context,
-                                      firstDate: snapshotFirstPage.data,
-                                      initialDate: snapshot.data,
-                                      lastDate: snapshot.data,
-                                    ).then((value) async {
-                                      Firestore.instance
-                                          .collection('diaries')
-                                          .document('myDiary')
-                                          .collection('pages')
-                                          .where('date',
-                                              isGreaterThanOrEqualTo:
-                                                  Timestamp.fromDate(DateTime(
-                                                      value.year, value.month)))
-                                          .orderBy('date', descending: true);
-                                      pagesList
-                                          .getDocuments()
-                                          .then((value) => value);
-                                    });
-                                  } else if (snapshot.hasError) {
-                                    return Text(
-                                      'Erro ao recuperar primeiro mes ${snapshot.error}',
-                                      textAlign: TextAlign.center,
-                                    );
-                                  } else {
-                                    return Center(
-                                      child: CircularProgressIndicator(
-                                        backgroundColor:
-                                            Theme.of(context).primaryColorDark,
-                                      ),
-                                    );
-                                  }
+                                  return showMonthPicker(
+                                    context: context,
+                                    firstDate: firstPageSnap.data,
+                                    initialDate: DateTime.now(),
+                                    lastDate: DateTime.now(),
+                                  ).then((value) async {
+                                    if (!value.isAtSameMomentAs(selectedMoth)) {
+                                      print('selectedMoth = $selectedMoth');
+                                      selectedMoth =
+                                          DateTime(value.year, value.month);
+                                      print('selectedMoth = $selectedMoth');
+                                      print(
+                                          'currentPageList = $currentPageList');
+                                      var newPageList =
+                                          await _getPageListMonth(selectedMoth);
+                                      _updatePageList(newPageList);
+                                      print(
+                                          'currentPageList = $currentPageList');
+                                    }
+                                  });
                                 },
                                 child: Text(
-                                  DateTime.now().month.toString(),
+                                  selectedMoth.toUtc().month.toString(),
                                   style: TextStyle(
                                     fontSize: 21,
                                     fontWeight: FontWeight.w200,
@@ -133,8 +140,12 @@ class HomeScreen extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            lastPage != null ||
-                                    true // && DateTime.now().toUtc().day != lastPage.toUtc().day
+                            pagesListSnap.data.isEmpty ||
+                                    DateTime.now().toUtc().day !=
+                                        pagesListSnap.data[0]['date']
+                                            .toDate()
+                                            .toUtc()
+                                            .day
                                 ? IconButton(
                                     onPressed: () => Navigator.push(
                                         context,
@@ -150,11 +161,16 @@ class HomeScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    body: PagesPopup(initialPages: pagesList),
+                    body: pagesListSnap.data.isNotEmpty
+                        ? InheritedPageListPopup(
+                            pageList: currentPageList,
+                            child: PagesPopup(),
+                          )
+                        : Text('Escreva algo em seu diário'),
                   );
-                } else if (snapshot.hasError) {
+                } else if (pagesListSnap.hasError) {
                   return Text(
-                    'Erro ao recuperar paginas ${snapshot.error}',
+                    'Erro ao recuperar paginas ${pagesListSnap.error}',
                     textAlign: TextAlign.center,
                   );
                 } else {
