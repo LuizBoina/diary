@@ -1,9 +1,7 @@
 import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:diary/screens/home.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 
@@ -12,6 +10,7 @@ class CameraScreen extends StatefulWidget {
   final String text;
 
   const CameraScreen({Key key, this.date, this.text}) : super(key: key);
+
   @override
   _CameraScreenState createState() {
     return _CameraScreenState();
@@ -28,7 +27,6 @@ class _CameraScreenState extends State<CameraScreen> {
   void initState() {
     super.initState();
     availableCameras().then((availableCameras) {
-
       cameras = availableCameras;
 
       if (cameras.length > 0) {
@@ -37,7 +35,7 @@ class _CameraScreenState extends State<CameraScreen> {
         });
 
         _initCameraController(cameras[selectedCameraIdx]).then((void v) {});
-      }else{
+      } else {
         print("No camera available");
       }
     }).catchError((err) {
@@ -80,7 +78,7 @@ class _CameraScreenState extends State<CameraScreen> {
       appBar: AppBar(
         centerTitle: true,
         title: const Text(
-            'Seja você',
+          'Seja você',
           style: TextStyle(
             shadows: <Shadow>[
               Shadow(
@@ -197,7 +195,7 @@ class _CameraScreenState extends State<CameraScreen> {
 
   void _onSwitchCamera() {
     selectedCameraIdx =
-    selectedCameraIdx < cameras.length - 1 ? selectedCameraIdx + 1 : 0;
+        selectedCameraIdx < cameras.length - 1 ? selectedCameraIdx + 1 : 0;
     CameraDescription selectedCamera = cameras[selectedCameraIdx];
     _initCameraController(selectedCamera);
   }
@@ -206,15 +204,11 @@ class _CameraScreenState extends State<CameraScreen> {
     // Take the Picture in a try / catch block. If anything goes wrong,
     // catch the error.
     try {
-      final path = '${(await getApplicationDocumentsDirectory()).path}/${widget.date}.png';
+      final path =
+          '${(await getApplicationDocumentsDirectory()).path}/${widget.date}.png';
       await controller.takePicture(path);
       await _saveFirebase(path);
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => HomeScreen(),
-        ),
-      );
+      Navigator.popUntil(context, (route) => route.isFirst);
     } catch (e) {
       // If an error occurs, log the error to the console.
       _showCameraException(e);
@@ -224,7 +218,8 @@ class _CameraScreenState extends State<CameraScreen> {
   Future _saveFirebase(String path) async {
     try {
       //save image
-      StorageReference firebaseStorageRef = FirebaseStorage.instance.ref().child(path);
+      StorageReference firebaseStorageRef =
+          FirebaseStorage.instance.ref().child(path);
       StorageUploadTask uploadTask = firebaseStorageRef.putFile(File(path));
       await uploadTask.onComplete;
       //save page
@@ -233,15 +228,13 @@ class _CameraScreenState extends State<CameraScreen> {
           .document('myDiary')
           .collection('pages')
           .add({
-            'text': widget.text,
-            'imageUrl': path,
-            'date': Timestamp.fromDate(widget.date)
+        'text': widget.text,
+        'imageUrl': path,
+        'date': Timestamp.fromDate(widget.date)
       });
-    }
-    catch (err) {
+    } catch (err) {
       print(err);
     }
-
   }
 
   void _showCameraException(CameraException e) {

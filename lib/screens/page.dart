@@ -4,7 +4,6 @@ import 'package:flutter/material.dart' hide Page;
 import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 
-
 class PageScreen extends StatefulWidget {
   final DocumentSnapshot page;
 
@@ -31,7 +30,8 @@ class _PageScreenState extends State<PageScreen> {
           children: <Widget>[
             widget.page != null
                 ? Text(
-                    DateFormat('dd/MM/yyyy').format(widget.page['date'].toDate()),
+                    DateFormat('dd/MM/yyyy')
+                        .format(widget.page['date'].toDate()),
                     style: TextStyle(
                       shadows: <Shadow>[
                         Shadow(
@@ -46,65 +46,59 @@ class _PageScreenState extends State<PageScreen> {
                   )
                 : IconButton(
                     onPressed: () {
-                      if(_textController.text.isNotEmpty) {
+                      if (_textController.text.isNotEmpty) {
                         try {
                           final DateTime date = DateTime.now();
-                          Navigator.push(context,
+                          Navigator.push(
+                              context,
                               MaterialPageRoute(
                                   builder: (_) => CameraScreen(
-                                      date: date,
-                                      text: _textController.text
-                                  )
-                              ));
-                        }
-                        catch (err) {
-                          _scaffoldKey.currentState.showSnackBar(
-                              SnackBar(
-                                content: const Text(
-                                  'Erro com camera',
-                                  style: TextStyle(
-                                    shadows: <Shadow>[
-                                      Shadow(
-                                        blurRadius: 20.0,
-                                        color: Colors.grey,
-                                        offset: Offset(0, 0),
-                                      ),
-                                    ],
-                                    color: Colors.white70,
-                                    fontWeight: FontWeight.w100,
+                                      date: date, text: _textController.text)));
+                        } catch (err) {
+                          _scaffoldKey.currentState.showSnackBar(SnackBar(
+                            content: const Text(
+                              'Erro com camera',
+                              style: TextStyle(
+                                shadows: <Shadow>[
+                                  Shadow(
+                                    blurRadius: 20.0,
+                                    color: Colors.grey,
+                                    offset: Offset(0, 0),
                                   ),
-                                  textAlign: TextAlign.center,
-                                ),
-                                duration: Duration(seconds: 2),
-                                backgroundColor: Theme.of(context).dialogBackgroundColor,
-                              )
-                          );
-                        }
-                      }
-                      else {
-                        _scaffoldKey.currentState.showSnackBar(
-                            SnackBar(
-                              content: const Text(
-                                  'Como foi seu dia?',
-                                  style: TextStyle(
-                                    shadows: <Shadow>[
-                                      Shadow(
-                                        blurRadius: 20.0,
-                                        color: Colors.grey,
-                                        offset: Offset(0, 0),
-                                      ),
-                                    ],
-                                    color: Colors.white70,
-                                    fontWeight: FontWeight.w100,
-                                ),
-                                  textAlign: TextAlign.center,
+                                ],
+                                color: Colors.white70,
+                                fontWeight: FontWeight.w100,
                               ),
-                              duration: Duration(seconds: 2),
-                              backgroundColor: Theme.of(context).dialogBackgroundColor,
-                            )
-                        );
+                              textAlign: TextAlign.center,
+                            ),
+                            duration: Duration(seconds: 2),
+                            backgroundColor:
+                                Theme.of(context).dialogBackgroundColor,
+                          ));
+                        }
+                      } else {
+                        _scaffoldKey.currentState.showSnackBar(SnackBar(
+                          content: const Text(
+                            'Como foi seu dia?',
+                            style: TextStyle(
+                              shadows: <Shadow>[
+                                Shadow(
+                                  blurRadius: 20.0,
+                                  color: Colors.grey,
+                                  offset: Offset(0, 0),
+                                ),
+                              ],
+                              color: Colors.white70,
+                              fontWeight: FontWeight.w100,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          duration: Duration(seconds: 2),
+                          backgroundColor:
+                              Theme.of(context).dialogBackgroundColor,
+                        ));
                       }
-                      },
+                    },
                     icon: Icon(Icons.check),
                     iconSize: 28,
                     color: Colors.grey,
