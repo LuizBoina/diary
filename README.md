@@ -8,8 +8,12 @@ A new Flutter application.
 - no need internet connection to save new page
 - camera flash
 - loading screen on month selection and after taking a picture
+- change page text selection color
+
 ## Bug fixes
 - change selected month
+- if someone use the app rigth now he will have access to my diary (?)
+
 
 ## Getting Started
 
