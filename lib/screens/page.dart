@@ -6,8 +6,9 @@ import 'package:intl/intl.dart';
 
 class PageScreen extends StatefulWidget {
   final DocumentSnapshot page;
+  final String userId;
 
-  PageScreen({this.page});
+  PageScreen({this.page, this.userId});
 
   _PageScreenState createState() => _PageScreenState();
 }
@@ -53,7 +54,9 @@ class _PageScreenState extends State<PageScreen> {
                               context,
                               MaterialPageRoute(
                                   builder: (_) => CameraScreen(
-                                      date: date, text: _textController.text)));
+                                      userId: widget.userId,
+                                      date: date,
+                                      text: _textController.text)));
                         } catch (err) {
                           _scaffoldKey.currentState.showSnackBar(SnackBar(
                             content: const Text(

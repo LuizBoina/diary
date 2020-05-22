@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diary/screens/page.dart';
 import 'package:diary/widgets/page_day.dart';
 import 'package:diary/widgets/page_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' hide Page;
 import 'package:flutter/rendering.dart';
 
@@ -20,7 +21,6 @@ class InheritedPageListCards extends InheritedWidget {
 
   @override
   bool updateShouldNotify(InheritedPageListCards oldWidget) {
-    print('entrou = ${pageList.first != oldWidget.pageList.first}');
     return pageList.first != oldWidget.pageList.first;
   }
 }
@@ -81,7 +81,7 @@ class PagesCards extends StatelessWidget {
 
                       page['imageUrl'].isNotEmpty
                           ? PageImage(imageUrl: page['imageUrl'])
-                          : Text('')
+                          : Container(width: 50)
                     ],
                   ),
                 );

@@ -5,12 +5,15 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
+import 'package:path/path.dart' show join;
 
 class CameraScreen extends StatefulWidget {
   final DateTime date;
   final String text;
+  final String userId;
 
-  const CameraScreen({Key key, this.date, this.text}) : super(key: key);
+  const CameraScreen({Key key, this.date, this.text, this.userId})
+      : super(key: key);
 
   @override
   _CameraScreenState createState() {
@@ -123,12 +126,14 @@ class _CameraScreenState extends State<CameraScreen> {
   /// Display Camera preview.
   Widget _cameraPreviewWidget() {
     if (controller == null || !controller.value.isInitialized) {
-      return const Text(
-        'Loading',
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 20.0,
-          fontWeight: FontWeight.w900,
+      return Center(
+        child: const Text(
+          'Loading',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20.0,
+            fontWeight: FontWeight.w900,
+          ),
         ),
       );
     }
@@ -206,10 +211,17 @@ class _CameraScreenState extends State<CameraScreen> {
     // catch the error.
     try {
       DialogLoading.showLoadingDialog(context);
-      final path =
-          '${(await getApplicationDocumentsDirectory()).path}/${widget.date}.png';
-      await controller.takePicture(path);
-      await _saveFirebase(path);
+      final String _dirPath =
+          'users/${widget.userId}/${widget.date.year.toString()}/${widget.date
+          .month.toString().padLeft(2, "0")}';
+      final String finalPath =
+      join((await getApplicationDocumentsDirectory()).path, _dirPath);
+      String dirPath = (await Directory(finalPath).create(recursive: true))
+          .path;
+      final String imgPath =
+      join(dirPath, '${widget.date.day.toString().padLeft(2, "0")}.png');
+      await controller.takePicture(imgPath);
+      await _saveFirebase(imgPath);
       Navigator.popUntil(context, (route) => route.isFirst);
     } catch (e) {
       // If an error occurs, log the error to the console.
@@ -223,17 +235,22 @@ class _CameraScreenState extends State<CameraScreen> {
       StorageReference firebaseStorageRef =
           FirebaseStorage.instance.ref().child(path);
       StorageUploadTask uploadTask = firebaseStorageRef.putFile(File(path));
-      await uploadTask.onComplete;
-      //save page
-      Firestore.instance
-          .collection('diaries')
-          .document('myDiary')
-          .collection('pages')
-          .add({
-        'text': widget.text,
-        'imageUrl': path,
-        'date': Timestamp.fromDate(widget.date)
-      });
+      await uploadTask.onComplete.then((value) =>
+          Firestore.instance
+              .collection('users')
+              .document(widget.userId)
+              .collection('years')
+              .document(widget.date.year.toString())
+              .collection('months')
+              .document(widget.date.month.toString().padLeft(2, '0'))
+              .collection('days')
+              .document(widget.date.day.toString().padLeft(2, '0'))
+              .setData({
+            'text': widget.text,
+            'imageUrl': path,
+            'date': Timestamp.fromDate(widget.date)
+          })
+      );
     } catch (err) {
       print(err);
     }

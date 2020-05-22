@@ -12,8 +12,19 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  final Widget handleAuth =
-  getCurrentUser() != null ? HomeScreen() : LoginScreen();
+  Future<String> _getUserId() {
+    return (getCurrentUser()).then((user) {
+      print('user $user');
+      if (user == null) return 'NO_AUTH';
+      return user.uid;
+    });
+  }
+
+  Widget _circularLoading() {
+    return Center(
+      child: CircularProgressIndicator(),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,11 +33,27 @@ class MyApp extends StatelessWidget {
       create: (_) => ThemeManager(),
       child: Consumer<ThemeManager>(
         builder: (context, manager, _) =>
-            MaterialApp(
+            FutureProvider<String>(
+              create: (_) => _getUserId(),
+              child: Consumer<String>(
+                  builder: (BuildContext context, String userId, _) {
+                    Widget handleAuth;
+                    if (userId == null) {
+                      return _circularLoading();
+                    } else if (userId == 'NO_AUTH') {
+                      handleAuth = LoginScreen();
+                    } else {
+                      handleAuth = HomeScreen(
+                        userId: userId,
+                      );
+                    }
+                    return MaterialApp(
                 title: 'Flutter Diary',
                 debugShowCheckedModeBanner: false,
                 theme: manager.themeData,
-                home: handleAuth),
+                        home: handleAuth);
+                  }),
+            ),
       ),
     );
   }
