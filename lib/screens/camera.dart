@@ -1,5 +1,6 @@
 import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:diary/widgets/dialog_loading.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
@@ -204,6 +205,7 @@ class _CameraScreenState extends State<CameraScreen> {
     // Take the Picture in a try / catch block. If anything goes wrong,
     // catch the error.
     try {
+      DialogLoading.showLoadingDialog(context);
       final path =
           '${(await getApplicationDocumentsDirectory()).path}/${widget.date}.png';
       await controller.takePicture(path);

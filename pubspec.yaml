@@ -29,6 +29,10 @@ dependencies:
   cloud_firestore:
   firebase_storage: ^3.1.5
   month_picker_dialog: ^0.3.1
+  shared_preferences: <2.0.0
+  provider: ^4.1.2
+  firebase_auth: ^0.16.0
+  google_sign_in: ^4.5.0
   io:
 
   # The following adds the Cupertino Icons font to your application.
