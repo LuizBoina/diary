@@ -216,10 +216,10 @@ class _CameraScreenState extends State<CameraScreen> {
           .month.toString().padLeft(2, "0")}';
       final String finalPath =
       join((await getApplicationDocumentsDirectory()).path, _dirPath);
-      String dirPath = (await Directory(finalPath).create(recursive: true))
-          .path;
+      String dirPath =
+          (await Directory(finalPath).create(recursive: true)).path;
       final String imgPath =
-      join(dirPath, '${widget.date.day.toString().padLeft(2, "0")}.png');
+      join(dirPath, '${widget.date.day.toString().padLeft(22, "0")}.png');
       await controller.takePicture(imgPath);
       await _saveFirebase(imgPath);
       Navigator.popUntil(context, (route) => route.isFirst);
@@ -232,25 +232,26 @@ class _CameraScreenState extends State<CameraScreen> {
   Future _saveFirebase(String path) async {
     try {
       //save image
-      StorageReference firebaseStorageRef =
-          FirebaseStorage.instance.ref().child(path);
-      StorageUploadTask uploadTask = firebaseStorageRef.putFile(File(path));
-      await uploadTask.onComplete.then((value) =>
-          Firestore.instance
-              .collection('users')
-              .document(widget.userId)
-              .collection('years')
-              .document(widget.date.year.toString())
-              .collection('months')
-              .document(widget.date.month.toString().padLeft(2, '0'))
-              .collection('days')
-              .document(widget.date.day.toString().padLeft(2, '0'))
-              .setData({
-            'text': widget.text,
-            'imageUrl': path,
-            'date': Timestamp.fromDate(widget.date)
-          })
-      );
+      print('------------- $path');
+      await FirebaseStorage.instance
+          .ref()
+          .child(path)
+          .putFile(File(path))
+          .onComplete;
+      Firestore.instance
+          .collection('users')
+          .document(widget.userId)
+          .collection('years')
+          .document(widget.date.year.toString())
+          .collection('months')
+          .document(widget.date.month.toString().padLeft(2, '0'))
+          .collection('days')
+          .document(widget.date.day.toString().padLeft(2, '0'))
+          .setData({
+        'text': widget.text,
+        'imageUrl': path,
+        'date': Timestamp.fromDate(widget.date)
+      });
     } catch (err) {
       print(err);
     }
