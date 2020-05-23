@@ -41,7 +41,6 @@ class _PageScreenState extends State<PageScreen> {
                           offset: Offset(0, 0),
                         ),
                       ],
-                      color: Colors.white70,
                       fontWeight: FontWeight.w100,
                     ),
                   )

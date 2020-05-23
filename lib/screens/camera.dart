@@ -219,20 +219,26 @@ class _CameraScreenState extends State<CameraScreen> {
       String dirPath =
           (await Directory(finalPath).create(recursive: true)).path;
       final String imgPath =
-      join(dirPath, '${widget.date.day.toString().padLeft(22, "0")}.png');
+      join(dirPath, '${widget.date.day.toString().padLeft(2, "0")}.png');
       await controller.takePicture(imgPath);
+      // print('====================== $imgPath');
       await _saveFirebase(imgPath);
-      Navigator.popUntil(context, (route) => route.isFirst);
     } catch (e) {
       // If an error occurs, log the error to the console.
       _showCameraException(e);
+    } finally {
+      Navigator.popUntil(
+        context,
+        ModalRoute.withName(
+          Navigator.defaultRouteName,
+        ),
+      );
     }
   }
 
   Future _saveFirebase(String path) async {
     try {
       //save image
-      print('------------- $path');
       await FirebaseStorage.instance
           .ref()
           .child(path)

@@ -38,9 +38,10 @@ class PagesCards extends StatelessWidget {
               itemCount: widget.pageList.length,
               itemBuilder: (BuildContext context, int index) {
                 final DocumentSnapshot page = widget.pageList[index];
+                print('---------- page_cards ${page['text']}');
                 return Container(
                   height: 70,
-                  margin: EdgeInsets.all(5.0),
+                  margin: EdgeInsets.only(left: 5, top: 5, bottom: 5),
                   padding:
                   EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
                   decoration: BoxDecoration(

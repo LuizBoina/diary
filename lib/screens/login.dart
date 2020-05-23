@@ -32,13 +32,20 @@ class _LoginScreenState extends State<LoginScreen> {
     return OutlineButton(
       splashColor: Colors.grey,
       onPressed: () => signInWithGoogle().whenComplete(() {
-        Navigator.of(context).push(
+        Navigator.of(context, rootNavigator: true).push(
           MaterialPageRoute(
             builder: (context) {
               return HomeScreen();
             },
           ),
         );
+        /*Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) {
+              return HomeScreen();
+            },
+          ),
+        );*/
       }),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
       highlightElevation: 0,

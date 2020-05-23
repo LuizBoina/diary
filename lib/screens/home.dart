@@ -75,6 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   _monthChangeHandle(DateTime newDate) {
+    print('neo');
     DialogLoading.showLoadingDialog(context);
     selectedMonth = newDate;
     Firestore.instance
@@ -87,7 +88,11 @@ class _HomeScreenState extends State<HomeScreen> {
         .collection('days')
         .orderBy('date', descending: true)
         .getDocuments()
-        .then((daysDoc) => setState(() => _currentPageList = daysDoc.documents))
+        .then((daysDoc) =>
+        setState(() {
+          print(daysDoc.documents);
+          _currentPageList = daysDoc.documents;
+        }))
         .catchError((err) {
       print('err');
       Navigator.of(context /*, rootNavigator: true*/).pop();
@@ -134,51 +139,51 @@ class _HomeScreenState extends State<HomeScreen> {
                           title: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
-                              Expanded(
-                                flex: 3,
-                                child: GestureDetector(
-                                  onTap: () {
-                                    return showMonthPicker(
-                                      context: context,
-                                      firstDate: firstUploadMonth ??
-                                          DateTime.now(),
-                                      initialDate: selectedMonth,
-                                      lastDate: DateTime.now(),
-                                    ).then((value) {
-                                      if (!value.isAtSameMomentAs(
-                                          selectedMonth)) {
-                                        _monthChangeHandle(
-                                            DateTime(value.year, value.month));
-                                      }
-                                    }).catchError((err) => print('cancelado'));
-                                  },
-                                  child: Text(
-                                    selectedMonth
-                                        .toUtc()
-                                        .month
-                                        .toString(),
-                                    style: TextStyle(
-                                      fontSize: 21,
-                                      shadows: <Shadow>[
-                                        Shadow(
-                                          blurRadius: 30.0,
-                                          color: Colors.grey,
-                                          offset: Offset(0, 0),
-                                        ),
-                                      ],
-                                    ),
+                              GestureDetector(
+                                onTap: () {
+                                  return showMonthPicker(
+                                    context: context,
+                                    firstDate: firstUploadMonth ??
+                                        DateTime.now(),
+                                    initialDate: selectedMonth,
+                                    lastDate: DateTime.now(),
+                                  ).then((value) {
+                                    if (!value.isAtSameMomentAs(
+                                        selectedMonth)) {
+                                      _monthChangeHandle(
+                                          DateTime(value.year, value.month));
+                                    }
+                                  }).catchError((err) => print('cancelado'));
+                                },
+                                child: Text(
+                                  selectedMonth
+                                      .toUtc()
+                                      .month
+                                      .toString(),
+                                  style: TextStyle(
+                                    fontSize: 21,
+                                    shadows: <Shadow>[
+                                      Shadow(
+                                        blurRadius: 30.0,
+                                        color: Colors.grey,
+                                        offset: Offset(0, 0),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
-                              Expanded(
-                                flex: 3,
+                              Padding(
+                                padding: const EdgeInsets.only(left: 25),
                                 child: GestureDetector(
-                                  onTap: () =>
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (_) =>
-                                                  SettingsScreen())),
+                                  onTap: () {
+                                    _monthChangeHandle(DateTime(
+                                        selectedMonth.year,
+                                        selectedMonth.month));
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (_) => SettingsScreen()));
+                                  },
                                   child: Text(
                                     '日葵',
                                     style: TextStyle(
