@@ -31,11 +31,14 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _signInButton() {
     return OutlineButton(
       splashColor: Colors.grey,
-      onPressed: () => signInWithGoogle().whenComplete(() {
+      onPressed: () =>
+          signInWithGoogle().then((value) {
         Navigator.of(context, rootNavigator: true).push(
           MaterialPageRoute(
             builder: (context) {
-              return HomeScreen();
+              return HomeScreen(
+                userId: value,
+              );
             },
           ),
         );

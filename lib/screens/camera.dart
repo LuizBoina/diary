@@ -1,5 +1,7 @@
 import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:diary/return_home_handle.dart';
+import 'package:diary/screens/home.dart';
 import 'package:diary/widgets/dialog_loading.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -227,12 +229,16 @@ class _CameraScreenState extends State<CameraScreen> {
       // If an error occurs, log the error to the console.
       _showCameraException(e);
     } finally {
-      Navigator.popUntil(
-        context,
-        ModalRoute.withName(
-          Navigator.defaultRouteName,
-        ),
-      );
+      Navigator.of(context).pushNamedAndRemoveUntil(
+          ReturnHomeHandleScreen.routeName, (Route<dynamic> route) => false,
+          arguments: HomeArguments(widget.userId));
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (_) =>
+                  HomeScreen(
+                    userId: widget.userId,
+                  )));
     }
   }
 

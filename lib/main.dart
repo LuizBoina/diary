@@ -1,4 +1,5 @@
 import 'package:diary/auth/google_auth.dart';
+import 'package:diary/return_home_handle.dart';
 import 'package:diary/screens/home.dart';
 import 'package:diary/screens/login.dart';
 import 'package:diary/theme/manager.dart';
@@ -48,6 +49,10 @@ class MyApp extends StatelessWidget {
                       );
                     }
                     return MaterialApp(
+                        routes: {
+                          ReturnHomeHandleScreen.routeName: (context) =>
+                              ReturnHomeHandleScreen()
+                        },
                 title: 'Flutter Diary',
                 debugShowCheckedModeBanner: false,
                 theme: manager.themeData,

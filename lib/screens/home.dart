@@ -109,6 +109,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print('userId ---------- ${widget.userId}');
     return FutureProvider<DateTime>(
         create: (_) => _getFirstUploadedMonth(),
         child: Consumer<DateTime>(
@@ -176,9 +177,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                 padding: const EdgeInsets.only(left: 25),
                                 child: GestureDetector(
                                   onTap: () {
-                                    _monthChangeHandle(DateTime(
-                                        selectedMonth.year,
-                                        selectedMonth.month));
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(
